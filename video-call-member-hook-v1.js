@@ -1,0 +1,1 @@
+(()=>{if(window.WAAXXSS_VIDEO_CALL_MEMBER_HOOK)return;document.addEventListener('click',e=>{const stop=e.target.closest?.('[data-vdo="stop"]');if(stop)setTimeout(()=>window.dispatchEvent(new CustomEvent('wx:video-chat-ended',{detail:{reason:'user_stop',at:Date.now()}})),0)});window.WAAXXSS_VIDEO_CALL_MEMBER_HOOK={version:'1',status:'MEMBER_CALL_END_EVENT_READY'}})();
