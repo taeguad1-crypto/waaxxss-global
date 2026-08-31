@@ -14,31 +14,35 @@
 <script>
 (function(){
  const screen=document.getElementById('screen'),app=document.getElementById('app'),img=document.getElementById('officialLogo');
+ const LOGO='./file_00000000c3d0820983b48532d4a822ef.png';
  function clearWhite(){try{const c=document.createElement('canvas'),x=c.getContext('2d',{willReadFrequently:true});c.width=img.naturalWidth;c.height=img.naturalHeight;x.drawImage(img,0,0);const d=x.getImageData(0,0,c.width,c.height),p=d.data;for(let i=0;i<p.length;i+=4){const v=(p[i]+p[i+1]+p[i+2])/3;if(v>205)p[i+3]=Math.max(0,Math.min(255,(235-v)*8.5));else{p[i]=224;p[i+1]=216;p[i+2]=201}}x.putImageData(d,0,0);img.src=c.toDataURL('image/png')}catch(e){}}
  if(img.complete)clearWhite();else img.addEventListener('load',clearWhite,{once:true});
  let entered=false;
  function reveal(){if(entered)return;entered=true;screen.classList.add('hide');app.classList.add('ready')}
+ function addScript(d,src,id){if(d.getElementById(id))return;const s=d.createElement('script');s.id=id;s.src=src;s.defer=true;d.body.appendChild(s)}
  function repairApp(){
   try{
-   const w=app.contentWindow,d=app.contentDocument;
-   if(!w||!d)return;
-   w.LOGO='./file_00000000c3d0820983b48532d4a822ef.png';
+   const w=app.contentWindow,d=app.contentDocument;if(!w||!d)return;
    const splash=d.getElementById('splash');if(splash)splash.remove();
-   if(typeof w.initAssets==='function')w.initAssets();
-   if(typeof w.renderHome==='function')w.renderHome();
-   if(typeof w.renderShop==='function')w.renderShop();
-   d.documentElement.style.touchAction='manipulation';
-   d.body.style.touchAction='pan-x pan-y pinch-zoom';
+   d.querySelectorAll('[data-logo]').forEach(el=>{el.src=LOGO;el.onerror=null});
+   let images=null;
+   try{images=w.eval('typeof IMAGES!=="undefined"?IMAGES:null')}catch(e){}
+   if(images){d.querySelectorAll('[data-img]').forEach(el=>{const k=el.dataset.img;if(images[k])el.src=images[k]})}
+   try{w.LOGO=LOGO;if(typeof w.initAssets==='function')w.initAssets()}catch(e){}
+   try{if(typeof w.renderHome==='function')w.renderHome();if(typeof w.renderShop==='function')w.renderShop()}catch(e){}
+   addScript(d,'./chat-command-center-v1.js','wx-chat-loader');
+   addScript(d,'./chat-inline-media-v1.js','wx-chat-media-loader');
+   d.documentElement.style.touchAction='manipulation';d.body.style.touchAction='pan-x pan-y pinch-zoom';
    d.querySelectorAll('button,a').forEach(el=>{el.style.touchAction='manipulation';el.style.webkitTapHighlightColor='rgba(0,0,0,.08)'});
+   d.querySelectorAll('button').forEach(el=>{if((el.textContent||'').trim()==='AI SHOP'&&!el.dataset.wxAiBound){el.dataset.wxAiBound='1';el.addEventListener('click',()=>setTimeout(()=>{try{if(w.WAAXXSS_CHAT)w.WAAXXSS_CHAT.open()}catch(e){}},120))}});
    app.classList.add('ready');
   }catch(e){app.classList.add('ready')}
  }
- app.addEventListener('load',()=>{repairApp();setTimeout(repairApp,180);setTimeout(repairApp,700)});
+ app.addEventListener('load',()=>{repairApp();setTimeout(repairApp,180);setTimeout(repairApp,700);setTimeout(repairApp,1600)});
  screen.addEventListener('click',()=>{repairApp();reveal()});
  screen.addEventListener('touchend',e=>{e.preventDefault();repairApp();reveal()},{passive:false});
  screen.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();repairApp();reveal()}});
- setTimeout(()=>{repairApp();reveal()},2200);
- setTimeout(repairApp,3800);
+ setTimeout(()=>{repairApp();reveal()},2200);setTimeout(repairApp,3800);
 })();
 </script>
 </body>
