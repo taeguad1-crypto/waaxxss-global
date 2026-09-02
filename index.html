@@ -25,13 +25,19 @@
    const w=app.contentWindow,d=app.contentDocument;if(!w||!d)return;
    const splash=d.getElementById('splash');if(splash)splash.remove();
    d.querySelectorAll('[data-logo]').forEach(el=>{el.src=LOGO;el.onerror=null});
-   let images=null;
+   let images=null,products=null;
    try{images=w.eval('typeof IMAGES!=="undefined"?IMAGES:null')}catch(e){}
-   if(images){d.querySelectorAll('[data-img]').forEach(el=>{const k=el.dataset.img;if(images[k])el.src=images[k]})}
+   try{products=w.eval('typeof PRODUCTS!=="undefined"?PRODUCTS:null')}catch(e){}
+   if(images){w.IMAGES=images;d.querySelectorAll('[data-img]').forEach(el=>{const k=el.dataset.img;if(images[k])el.src=images[k]})}
+   if(Array.isArray(products))w.PRODUCTS=products;
    try{w.LOGO=LOGO;if(typeof w.initAssets==='function')w.initAssets()}catch(e){}
    try{if(typeof w.renderHome==='function')w.renderHome();if(typeof w.renderShop==='function')w.renderShop()}catch(e){}
    addScript(d,'./chat-command-center-v1.js','wx-chat-loader');
    addScript(d,'./chat-inline-media-v1.js','wx-chat-media-loader');
+   addScript(d,'./image-resilience-v3.js','wx-image-resilience-loader');
+   addScript(d,'./ux-continuity-v4.js','wx-continuity-loader');
+   addScript(d,'./system-qa-v5.js','wx-system-qa-loader');
+   addScript(d,'./daily-qa-v1.js','wx-daily-qa-loader');
    d.documentElement.style.touchAction='manipulation';d.body.style.touchAction='pan-x pan-y pinch-zoom';
    d.querySelectorAll('button,a').forEach(el=>{el.style.touchAction='manipulation';el.style.webkitTapHighlightColor='rgba(0,0,0,.08)'});
    d.querySelectorAll('button').forEach(el=>{if((el.textContent||'').trim()==='AI SHOP'&&!el.dataset.wxAiBound){el.dataset.wxAiBound='1';el.addEventListener('click',()=>setTimeout(()=>{try{if(w.WAAXXSS_CHAT)w.WAAXXSS_CHAT.open()}catch(e){}},120))}});
