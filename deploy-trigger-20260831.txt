@@ -1,1 +1,0 @@
-WAAXXSS Vercel production deploy trigger after root directory and static routing fix.
