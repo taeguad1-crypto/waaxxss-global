@@ -31,6 +31,7 @@
    if(images){w.IMAGES=images;d.querySelectorAll('[data-img]').forEach(el=>{const k=el.dataset.img;if(images[k])el.src=images[k]})}
    if(Array.isArray(products))w.PRODUCTS=products;
    try{w.LOGO=LOGO;if(typeof w.initAssets==='function')w.initAssets()}catch(e){}
+   d.querySelectorAll('[data-logo]').forEach(el=>{el.src=LOGO;el.onerror=null});
    try{if(typeof w.renderHome==='function')w.renderHome();if(typeof w.renderShop==='function')w.renderShop()}catch(e){}
    addScript(d,'./chat-command-center-v1.js','wx-chat-loader');
    addScript(d,'./chat-inline-media-v1.js','wx-chat-media-loader');
