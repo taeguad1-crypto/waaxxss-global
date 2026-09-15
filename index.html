@@ -10,12 +10,12 @@
 </head>
 <body>
 <iframe id="app" class="appframe" src="./v21.html" title="WAAXXSS Global"></iframe>
-<main class="screen" id="screen" role="button" tabindex="0" aria-label="Enter WAAXXSS"><section class="content"><div class="logoWrap"><img id="officialLogo" class="logo" src="./file_00000000c3d0820983b48532d4a822ef.png" alt="WAAXXSS official logo"></div><div class="tag">BEYOND THE EDGE · KOREA</div><div class="line"></div></section><div class="enter">TAP TO ENTER</div></main>
+<main class="screen" id="screen" role="button" tabindex="0" aria-label="Enter WAAXXSS"><section class="content"><div class="logoWrap"><img id="officialLogo" class="logo" data-wx-preserve-official="1" src="./file_00000000c3d0820983b48532d4a822ef.png" alt="WAAXXSS official logo"></div><div class="tag">BEYOND THE EDGE · KOREA</div><div class="line"></div></section><div class="enter">TAP TO ENTER</div></main>
 <script>
 (function(){
  const screen=document.getElementById('screen'),app=document.getElementById('app'),img=document.getElementById('officialLogo');
  const LOGO='./file_00000000c3d0820983b48532d4a822ef.png';
- function clearWhite(){try{const c=document.createElement('canvas'),x=c.getContext('2d',{willReadFrequently:true});c.width=img.naturalWidth;c.height=img.naturalHeight;x.drawImage(img,0,0);const d=x.getImageData(0,0,c.width,c.height),p=d.data;for(let i=0;i<p.length;i+=4){const v=(p[i]+p[i+1]+p[i+2])/3;if(v>205)p[i+3]=Math.max(0,Math.min(255,(235-v)*8.5));else{p[i]=224;p[i+1]=216;p[i+2]=201}}x.putImageData(d,0,0);img.src=c.toDataURL('image/png')}catch(e){}}
+ function clearWhite(){if(img.dataset.wxPreserveOfficial==='1')return;try{const c=document.createElement('canvas'),x=c.getContext('2d',{willReadFrequently:true});c.width=img.naturalWidth;c.height=img.naturalHeight;x.drawImage(img,0,0);const d=x.getImageData(0,0,c.width,c.height),p=d.data;for(let i=0;i<p.length;i+=4){const v=(p[i]+p[i+1]+p[i+2])/3;if(v>205)p[i+3]=Math.max(0,Math.min(255,(235-v)*8.5));else{p[i]=224;p[i+1]=216;p[i+2]=201}}x.putImageData(d,0,0);img.src=c.toDataURL('image/png')}catch(e){}}
  if(img.complete)clearWhite();else img.addEventListener('load',clearWhite,{once:true});
  let entered=false;
  function reveal(){if(entered)return;entered=true;screen.classList.add('hide');app.classList.add('ready')}
@@ -39,6 +39,7 @@
    addScript(d,'./ux-continuity-v4.js','wx-continuity-loader');
    addScript(d,'./product-close-history-v1.js','wx-product-close-history-loader');
    addScript(d,'./product-viewer-v2.js','wx-product-viewer-loader');
+   addScript(d,'./mobile-product-gesture-v1.js','wx-mobile-product-gesture-loader');
    addScript(d,'./shop-scroll-sort-v3.js','wx-shop-sort-loader');
    addScript(d,'./shop-search-filter-v1.js','wx-shop-search-loader');
    addScript(d,'./click-audit-v3.js','wx-click-audit-loader');
