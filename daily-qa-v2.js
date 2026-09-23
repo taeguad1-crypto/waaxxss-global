@@ -16,6 +16,13 @@
     const homeControls=$$('button,a,[role="button"]').filter(el=>/^HOME$/i.test(text(el))||el.dataset.p==='home');
     if(!homeControls.length)warnings.push('HOME control not found');
     else if(!homeControls.some(el=>el.dataset.p==='home'||/showPage\(['\"]home['\"]\)/.test(el.getAttribute('onclick')||'')||/\bhome\b/i.test(el.getAttribute('href')||'')))warnings.push('HOME control found but route binding is not explicit');
+    const headerLogo=$('.brand img[data-logo],header .brand img,header img[data-logo]');
+    const headerLogoButton=headerLogo?.closest('button,a,[role="button"]');
+    const headerLogoHome=!!(headerLogoButton&&(headerLogoButton.dataset.p==='home'||/showPage\(['\"]home['\"]\)/.test(headerLogoButton.getAttribute('onclick')||'')||/\bhome\b/i.test(headerLogoButton.getAttribute('href')||'')));
+    if(headerLogo&&!headerLogoHome)warnings.push('header WAAXXSS logo is not explicitly bound to HOME');
+    const drawerLogo=$('.drawerTop [data-logo],.drawer [data-logo]');
+    const drawerLogoHome=!!(drawerLogo&&(drawerLogo.dataset.wxHomeLogo3==='1'||drawerLogo.closest('[data-p="home"],[href*="home"]')));
+    if(drawerLogo&&!drawerLogoHome)warnings.push('drawer WAAXXSS logo HOME binding not ready');
 
     const productButtons=$$('[onclick*="openProduct"],[data-product-id]');
     const brokenProductButtons=productButtons.filter(el=>{const m=(el.getAttribute('onclick')||'').match(/openProduct\(['\"]([^'\"]+)/);const id=el.dataset.productId||m?.[1];return id&&products.length&&!products.some(p=>String(p.id)===String(id))});
@@ -59,6 +66,16 @@
     const mainPic=$('.mainPic',modal||document);
     const pinchReady=mainPic?.dataset.wxViewer==='v2';
     if(mainPic&&!pinchReady)warnings.push('pinch/drag product viewer not ready');
+    const verticalGestureSafe=!mainPic||mainPic.dataset.wxVerticalScrollSafe==='1';
+    if(mainPic&&!verticalGestureSafe)warnings.push('product viewer vertical-scroll safety enhancer not ready');
+    if(mainPic&&mainPic.getAttribute('data-wx-zoom')!=='zoomed'){
+      const touchAction=(getComputedStyle(mainPic).touchAction||mainPic.style.touchAction||'').toLowerCase();
+      if(touchAction==='none')warnings.push('product viewer blocks vertical touch scroll at normal zoom');
+    }
+    const backHistoryReady=document.documentElement.dataset.wxContinuityV4==='1';
+    const closeHistoryReady=document.documentElement.dataset.wxProductCloseHistory==='v1';
+    if(!backHistoryReady)warnings.push('page/back history continuity enhancer not ready');
+    if(!closeHistoryReady)warnings.push('product close/back history enhancer not ready');
     const openModal=$('.modal.on,.productModal.on,#productModal.on');
     if(openModal){
       const gallerySrc=uniq([$('.mainPic img',openModal)?.currentSrc||$('.mainPic img',openModal)?.src,...$$('.thumbs img',openModal).map(x=>x.currentSrc||x.src)].filter(Boolean));
@@ -86,7 +103,8 @@
     const runtime={chat:!!(window.WAAXXSS_CHAT||window.WAAXXSS_CHAT_OS),inlineMedia:!!window.WAAXXSS_CHAT_INLINE_MEDIA,aiWorkspace:!!window.WAAXXSS_AI_WORKSPACE,memberSync:!!window.WAAXXSS_MEMBER_DATA_SYNC,realtime:!!window.WAAXXSS_MEMBER_REALTIME,secureCall:!!window.WAAXXSS_SECURE_WEBRTC_CALL};
     const external={payment:'NOT AUTO-ACTIVATED — payment credentials/business decision required',login:'NOT AUTO-ACTIVATED — external auth configuration required',gps:'NOT AUTO-ACTIVATED — device permission/runtime required',externalAI:'NOT AUTO-ACTIVATED — provider API/secret required',domainDeploy:'NOT AUTO-CHANGED — deployment/domain decision outside static QA',manufacturer:'NOT AUTO-ACTIVATED — manufacturer account/workflow approval required',admin:'NOT AUTO-ACTIVATED — admin authorization policy required'};
 
-    const report={checkedAt:new Date().toISOString(),version:'v2',status:critical.length?'FAIL':warnings.length?'CHECK':'PASS',critical:uniq(critical),warnings:uniq(warnings),info:uniq(info),coverage:{ui:true,routing:true,click:true,backHistory:!!document.documentElement.dataset.wxContinuityV4,logoHome:true,mobile:true,verticalHorizontalScroll:true,sorting:true,sequence:true,search:true,filter:true,popup:true,productDetail:true,pinchZoom:true,imageIntegrity:true,integrations:true},counts:{products:products.length,productButtons:productButtons.length,renderedImages:imgs.length,brokenImages:broken.length,duplicateRenderedImageOccurrences:duplicateOccurrences,logoElements:logoEls.length,shopProducts:shopProducts.length,sequenceLabels:seq.length},routeTargets,runtime,external,officialLogo:official,principle:'SAFE ADDITIVE diagnostic; no working feature or brand asset is removed/reverted'};
+    const logoHomeReady=headerLogoHome&&(!drawerLogo||drawerLogoHome);
+    const report={checkedAt:new Date().toISOString(),version:'v2.1',status:critical.length?'FAIL':warnings.length?'CHECK':'PASS',critical:uniq(critical),warnings:uniq(warnings),info:uniq(info),coverage:{ui:true,routing:true,click:true,backHistory:backHistoryReady&&closeHistoryReady,logoHome:logoHomeReady,mobile:true,verticalHorizontalScroll:true,sorting:true,sequence:true,search:true,filter:true,popup:true,productDetail:true,pinchZoom:!!pinchReady,productVerticalScroll:verticalGestureSafe,imageIntegrity:true,integrations:true},counts:{products:products.length,productButtons:productButtons.length,renderedImages:imgs.length,brokenImages:broken.length,duplicateRenderedImageOccurrences:duplicateOccurrences,logoElements:logoEls.length,shopProducts:shopProducts.length,sequenceLabels:seq.length},routeTargets,runtime,external,officialLogo:official,principle:'SAFE ADDITIVE diagnostic; no working feature or brand asset is removed/reverted'};
     window.WAAXXSS_DAILY_QA_V2=report;window.WAAXXSS_RUN_DAILY_QA_V2=run;document.documentElement.dataset.wxDailyQaV2=report.status.toLowerCase();return report;
   }
   window.WAAXXSS_RUN_DAILY_QA_V2=run;
