@@ -11,6 +11,8 @@
     const official='file_00000000c3d0820983b48532d4a822ef.png';
     const badLogo=logoEls.filter(el=>{const src=el.getAttribute('src')||'';return src&&!src.includes(official)});
     if(badLogo.length)critical.push(`non-official WAAXXSS logo asset(s): ${badLogo.length}`);
+    const legacyInline=[...document.scripts].find(s=>(s.textContent||'').includes('const IMAGES=')&&(s.textContent||'').includes('const PRODUCTS='));
+    if(legacyInline&&/const LOGO=\"data:image\/png;base64,[^\"]+\"\};/.test(legacyInline.textContent||''))critical.push('legacy inline core syntax malformed at LOGO constant');
 
     ['showPage','filterShop','openProduct','closeProduct'].forEach(n=>{if(typeof window[n]!=='function')critical.push(`missing core function: ${n}`)});
     const homeControls=$$('button,a,[role="button"]').filter(el=>/^HOME$/i.test(text(el))||el.dataset.p==='home');
