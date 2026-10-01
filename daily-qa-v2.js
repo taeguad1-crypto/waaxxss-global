@@ -37,6 +37,18 @@
       if(p?.alt==='hero'&&p?.img!=='hero')warnings.push(`product uses unrelated HERO as alternate image: ${p.id}`);
     });
     if(dataImageIssues.length)critical.push(`product image keys missing from IMAGES: ${dataImageIssues.length}`);
+    const imagePayloadGroups=[];
+    try{
+      const grouped=new Map();
+      Object.entries(images||{}).forEach(([key,src])=>{
+        if(typeof src!=='string'||!src)return;
+        const keys=grouped.get(src)||[];
+        keys.push(key);
+        grouped.set(src,keys);
+      });
+      grouped.forEach(keys=>{if(keys.length>1)imagePayloadGroups.push(keys)});
+      if(imagePayloadGroups.length)warnings.push(`duplicate IMAGES payload groups: ${imagePayloadGroups.map(g=>g.join('=')).join('; ')}`);
+    }catch(e){}
 
     const imgs=$$('img'), broken=imgs.filter(x=>x.complete&&x.src&&x.naturalWidth===0), noSrc=imgs.filter(x=>!x.getAttribute('src'));
     if(broken.length)warnings.push(`broken rendered images: ${broken.length}`);
@@ -106,7 +118,7 @@
     const external={payment:'NOT AUTO-ACTIVATED — payment credentials/business decision required',login:'NOT AUTO-ACTIVATED — external auth configuration required',gps:'NOT AUTO-ACTIVATED — device permission/runtime required',externalAI:'NOT AUTO-ACTIVATED — provider API/secret required',domainDeploy:'NOT AUTO-CHANGED — deployment/domain decision outside static QA',manufacturer:'NOT AUTO-ACTIVATED — manufacturer account/workflow approval required',admin:'NOT AUTO-ACTIVATED — admin authorization policy required'};
 
     const logoHomeReady=headerLogoHome&&(!drawerLogo||drawerLogoHome);
-    const report={checkedAt:new Date().toISOString(),version:'v2.1',status:critical.length?'FAIL':warnings.length?'CHECK':'PASS',critical:uniq(critical),warnings:uniq(warnings),info:uniq(info),coverage:{ui:true,routing:true,click:true,backHistory:backHistoryReady&&closeHistoryReady,logoHome:logoHomeReady,mobile:true,verticalHorizontalScroll:true,sorting:true,sequence:true,search:true,filter:true,popup:true,productDetail:true,pinchZoom:!!pinchReady,productVerticalScroll:verticalGestureSafe,imageIntegrity:true,integrations:true},counts:{products:products.length,productButtons:productButtons.length,renderedImages:imgs.length,brokenImages:broken.length,duplicateRenderedImageOccurrences:duplicateOccurrences,logoElements:logoEls.length,shopProducts:shopProducts.length,sequenceLabels:seq.length},routeTargets,runtime,external,officialLogo:official,principle:'SAFE ADDITIVE diagnostic; no working feature or brand asset is removed/reverted'};
+    const report={checkedAt:new Date().toISOString(),version:'v2.2',status:critical.length?'FAIL':warnings.length?'CHECK':'PASS',critical:uniq(critical),warnings:uniq(warnings),info:uniq(info),coverage:{ui:true,routing:true,click:true,backHistory:backHistoryReady&&closeHistoryReady,logoHome:logoHomeReady,mobile:true,verticalHorizontalScroll:true,sorting:true,sequence:true,search:true,filter:true,popup:true,productDetail:true,pinchZoom:!!pinchReady,productVerticalScroll:verticalGestureSafe,imageIntegrity:true,integrations:true},counts:{products:products.length,productButtons:productButtons.length,renderedImages:imgs.length,brokenImages:broken.length,duplicateRenderedImageOccurrences:duplicateOccurrences,imagePayloadDuplicateGroups:imagePayloadGroups.length,logoElements:logoEls.length,shopProducts:shopProducts.length,sequenceLabels:seq.length},imagePayloadDuplicateGroups,routeTargets,runtime,external,officialLogo:official,principle:'SAFE ADDITIVE diagnostic; no working feature or brand asset is removed/reverted'};
     window.WAAXXSS_DAILY_QA_V2=report;window.WAAXXSS_RUN_DAILY_QA_V2=run;document.documentElement.dataset.wxDailyQaV2=report.status.toLowerCase();return report;
   }
   window.WAAXXSS_RUN_DAILY_QA_V2=run;
